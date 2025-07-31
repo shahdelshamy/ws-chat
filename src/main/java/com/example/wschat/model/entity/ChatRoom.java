@@ -19,6 +19,9 @@ public class ChatRoom {
     @Column(name = "id")
     private int id;
 
+    @Column(name = "chat_room")
+    private String chatRoom;
+
     @ManyToOne
     @JoinColumn(name = "sender_id")
     private User sender;

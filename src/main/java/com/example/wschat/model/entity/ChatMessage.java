@@ -21,14 +21,17 @@ public class ChatMessage {
     @Column(name = "id")
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "chat_room_id")
-    private ChatRoom chatRoom;
+//    @ManyToOne
+//    @JoinColumn(name = "chat_room_id")
+//    private ChatRoom chatRoom;
+
+    @Column(name = "chat_room")
+    private String chatRoom;
 
     @Column(name = "content")
     private String content;
 
-    @Column(name = "date")
+    @Column(name = "date", insertable = false)
     private LocalDateTime date;
 
 }

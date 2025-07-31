@@ -1,4 +1,12 @@
 package com.example.wschat.service;
 
+import com.example.wschat.model.dto.ChatMessageDTO;
+import com.example.wschat.model.entity.ChatMessage;
+
+import java.util.List;
+
 public interface ChatMessageService {
+
+    ChatMessageDTO save(ChatMessageDTO chatMessage);
+    List<ChatMessageDTO> findAllByChatRoomId(String chatRoom);
 }
