@@ -18,7 +18,7 @@ public abstract class ChatMapper {
     @Mapping(target = "chatRoom", source = "chatRoomId")
     public abstract ChatMessage toChatMessage(ChatMessageDTO chatMessageDTO, String chatRoomId) ;
 
-    @Mapping(target = "sender", source = "sender")
-    @Mapping(target = "recipient", source = "recipient")
+    @Mapping(target = "sender.firstName", source = "sender")
+    @Mapping(target = "recipient.firstName", source = "recipient")
     public abstract ChatMessageDTO toChatMessageDTO(ChatMessage chatMessage, String sender, String recipient) ;
 }

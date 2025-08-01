@@ -1,0 +1,244 @@
+body{
+    font-family: Arial, Helvetica, sans-serif;
+    background-color: #f5f5f5;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    height: 100vh;
+}
+
+.user-registration{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 400px;
+    padding: 10px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    background-color: #fff;
+    margin-bottom: 30px;
+}
+
+.user-registration h2{
+    margin: -8px 10px 10px;
+    padding-top: 10px;
+}
+
+.user-registration form {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+    display: flex;
+    flex-direction: column;
+    /*align-items: center;*/
+
+}
+
+.user-registration form div{
+    margin: 7px auto;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.user-registration label {
+    font-weight: bold;
+    width: 200px;
+}
+
+.user-registration input {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-sizing: border-box;
+}
+
+.user-registration input:focus {
+    outline: none;
+    border-color: #3498db;
+    box-shadow: 0 0 8px rgba(53, 152, 219, 0.5);
+}
+
+.user-registration button {
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    background-color: #3498db;
+    color: #fff;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.chat-container{
+    display: flex;
+    max-width: 800px;
+    min-width: 800px;
+    min-height: 550px;
+    max-height: 550px;
+    overflow: hidden;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    background-color: #fff;
+    border: 1px solid #ccc;
+}
+
+.users-list{
+    background-color: #f5f5f5;
+    padding: 5px 20px;
+    border-right: 1px solid #ccc;
+    width: 250px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.online-users{
+    overflow-y: scroll;
+    height: 100%;
+}
+
+.online-users h3{
+    margin-bottom: 5px;
+}
+
+.online-users ul{
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.user-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px;
+    cursor: pointer;
+}
+
+.user-item.active{
+    background-color: #cdebff;
+    color: #4f4f4f;
+    border-radius: 5px;
+    padding: 10px;
+}
+
+.user-item img{
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    margin-right: 10px;
+}
+
+.user-item span{
+    font-weight: bold;
+}
+
+.user-item span.nbr-msg {
+    margin-left: 10px;
+    background-color: #f8fa6f;
+    color: white;
+    padding: 5px;
+    width: 10px;
+    border-radius: 50%;
+    height: 10px;
+}
+
+/*.user{*/
+/*    padding: 10px;*/
+/*    cursor: pointer;*/
+/*    border-radius: 5px;*/
+/*    margin-bottom: 5px;*/
+/*}*/
+.chat-area{
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+}
+
+.separator {
+    height: 1px;
+    background-color: #ccc;
+    margin: 10px 0;
+}
+
+.chat-messages{
+    display: flex;
+    flex-direction: column;
+    overflow-y: scroll;
+    height: 100%;
+}
+
+.message{
+    margin-bottom: 5px;
+    border-radius: 5px;
+}
+
+.message p{
+    margin: 0;
+    padding: 5px;
+    word-wrap: break-word;
+}
+
+.sender{
+    background-color: #3498db;
+    color: #fff;
+    align-self: flex-end;
+}
+
+.receiver{
+    background-color: #ecf0f1;
+    color: #333;
+    align-self: flex-start;
+}
+
+.message-form{
+    display: flex;
+    box-sizing: border-box;
+    background-color: #fff;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    padding-bottom: 20px;
+}
+
+.message-form input{
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    margin-left: 10px;
+    border-color: #3498db ;
+    width: 450px;
+}
+
+.message-form input:focus{
+    outline: none;
+    border-color: #0a73b1;
+    box-shadow: 0 0 8px rgba(53, 152, 219, 0.5);
+    border-style: solid;
+}
+
+.message-form button{
+    padding: 8px;
+    margin-left: 15px;
+    border: none;
+    border-radius: 5px;
+    background-color: #3498db;
+    color: #fff;
+    cursor: pointer;
+    font-size: 17px;
+}
+
+.hidden{
+    display: none;
+}
+
+a.logout{
+    text-decoration: none;
+    color: #fff;
+    font-weight: bold;
+    margin-top: 10px;
+}
