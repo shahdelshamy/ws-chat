@@ -27,7 +27,7 @@ public class UserServiceImpl implements UserService {
          Optional<User> user = userJPARepository.findByPhoneNumber(userDTO.getPhoneNumber());
 
          if(user.isPresent()){
-             throw new RuntimeException("User already exists");
+             return chatMapper.toUserVTO(user.get());
          }
 
          User userEntity = chatMapper.toUser(userDTO);

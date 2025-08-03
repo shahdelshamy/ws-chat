@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chat Application</title>
     <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
 <body>
      <h2>Chat Application || By Shahd Abdelnaby 😊 </h2>
@@ -28,12 +29,12 @@
             </div>
 
             <div>
-                <button type="submit">Submit</button>
+                <button type="submit">Enter Chat Room</button>
             </div>
         </form>
     </div>
 
-     <div class="chat-container">
+     <div class="chat-container hidden">
 
          <div class="users-list">
 
@@ -45,18 +46,18 @@
              </div>
 
              <div class="user">
-                 <p class="user-name">User Name</p>
-                 <a href="" class="logout">Logout</a>
+                 <h3 class="user-name">User Name</h3>
+                 <a href="" class="logout">Logout <i class="fa-solid fa-right-from-bracket"></i></a>
              </div>
 
          </div>
 
-        <div class="chat-area">
+        <div class="chat-area hidden">
             <div class="chat-messages"></div>
 
             <form class="message-form">
                 <div>
-                    <input autocomplete="off" type="text" placeholder="Type your message here..." >
+                    <input class="message-input" autocomplete="off" type="text" placeholder="Type your message here..." >
                     <button type="submit">Send</button>
                 </div>
             </form>
@@ -64,8 +65,8 @@
 
      </div>
 
-     <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.1.4/sockjs.min.js"></script>
-     <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+     <script src="js/sockjs.min.js"></script>
+     <script src="js/stomp.min.js"></script>
     <script src="js/main.js"></script>
 
 </body>

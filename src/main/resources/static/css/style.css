@@ -7,7 +7,7 @@ body{
     justify-content: center;
     align-items: center;
     flex-direction: column;
-    height: 100vh;
+    /*height: 100vh;*/
 }
 
 .user-registration{
@@ -53,7 +53,7 @@ body{
 .user-registration input {
     width: 100%;
     padding: 8px;
-    border: 1px solid #ccc;
+    border: 1px solid #3498db;
     border-radius: 5px;
     box-sizing: border-box;
 }
@@ -76,10 +76,12 @@ body{
 
 .chat-container{
     display: flex;
-    max-width: 800px;
-    min-width: 800px;
-    min-height: 550px;
-    max-height: 550px;
+    width: 800px;
+    height: 550px;
+    /*max-width: 800px;*/
+    /*min-width: 800px;*/
+    /*min-height: 550px;*/
+    /*max-height: 550px;*/
     overflow: hidden;
     border-radius: 10px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
@@ -88,8 +90,9 @@ body{
 }
 
 .users-list{
-    background-color: #f5f5f5;
-    padding: 5px 20px;
+    background-color: #3498db;
+    color: #fff;
+    padding: 5px 0 5px 20px;
     border-right: 1px solid #ccc;
     width: 250px;
     display: flex;
@@ -100,7 +103,22 @@ body{
 .online-users{
     overflow-y: scroll;
     height: 100%;
+    scrollbar-width: thin; /* For Firefox */
+    scrollbar-color: #2980b9 #ecf0f1; /* For Firefox */
+    scroll-behavior: smooth;
 }
+/* For Chrome, Edge, Safari */
+.online-users::-webkit-scrollbar {
+    width: 8px;
+    border-radius: 10px;
+}
+
+.online-users::-webkit-scrollbar-track {
+    background: #ecf0f1;
+    border-radius: 10px;
+}
+
+
 
 .online-users h3{
     margin-bottom: 5px;
@@ -236,9 +254,15 @@ body{
     display: none;
 }
 
+.user h3{
+    word-wrap: break-word;
+    margin-bottom: 13px;
+}
 a.logout{
     text-decoration: none;
     color: #fff;
     font-weight: bold;
-    margin-top: 10px;
+    margin: 8px 11px 10px 0;
+    font-size: 18px;
+    display: inline-block;
 }
