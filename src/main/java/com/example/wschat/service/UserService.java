@@ -11,4 +11,5 @@ public interface UserService {
     UserVTO addUser(UserDTO userDTO);
     List<UserVTO> getConnectedUsers();
     UserVTO disConnectUser(UserDTO userDTO);
+    User getUserByPhoneNumber(String phoneNumber);
 }

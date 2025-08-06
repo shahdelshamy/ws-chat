@@ -21,12 +21,13 @@ public class ChatMessage {
     @Column(name = "id")
     private Long id;
 
-//    @ManyToOne
-//    @JoinColumn(name = "chat_room_id")
-//    private ChatRoom chatRoom;
+    @ManyToOne
+    @JoinColumn(name = "sender_id")
+    private User sender;
 
-    @Column(name = "chat_room")
-    private String chatRoom;
+    @ManyToOne
+    @JoinColumn(name = "recipient_id")
+    private User recipient;
 
     @Column(name = "content")
     private String content;

@@ -23,13 +23,14 @@ public class ChatMessageControllerImpl implements ChatController {
     public ResponseEntity<Void> send(ChatMessageDTO chatMessageDTO) {
         ChatMessageDTO chatMessage = chatMessageService.save(chatMessageDTO);
         simpMessagingTemplate.convertAndSendToUser(
-                chatMessageDTO.getRecipient().getFirstName(), "/queue/messages",
+                chatMessageDTO.getRecipient().getPhoneNumber(),  // username
+                "/queue/messages",                               // destination
                 chatMessageDTO);
         return ResponseEntity.status(NO_CONTENT).build();
     }
 
     @Override
-    public ResponseEntity<List<ChatMessageDTO>> getAllChatMessages(String chatRoomId) {
-        return ResponseEntity.ok(chatMessageService.findAllByChatRoomId(chatRoomId));
+    public ResponseEntity<List<ChatMessageDTO>> getAllChatMessages(String senderPhoneNumber, String recipientPhoneNumber) {
+        return ResponseEntity.ok(chatMessageService.findAllMessages(senderPhoneNumber , recipientPhoneNumber));
     }
 }

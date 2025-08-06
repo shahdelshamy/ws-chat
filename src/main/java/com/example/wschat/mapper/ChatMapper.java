@@ -15,10 +15,19 @@ public abstract class ChatMapper {
 
     public abstract UserVTO toUserVTO(User user);
 
-    @Mapping(target = "chatRoom", source = "chatRoomId")
-    public abstract ChatMessage toChatMessage(ChatMessageDTO chatMessageDTO, String chatRoomId) ;
+    @Mapping(target = "sender", source = "sender")
+    @Mapping(target = "recipient", source = "recipient")
+    @Mapping(target = "content", source = "chatMessageDTO.content")
+    @Mapping(target = "date", ignore = true)
+    @Mapping(target = "id", ignore = true)
+    public abstract ChatMessage toChatMessage(ChatMessageDTO chatMessageDTO , User sender, User recipient);
 
-    @Mapping(target = "sender.firstName", source = "sender")
-    @Mapping(target = "recipient.firstName", source = "recipient")
-    public abstract ChatMessageDTO toChatMessageDTO(ChatMessage chatMessage, String sender, String recipient) ;
+    public abstract ChatMessageDTO toChatMessageDTO(ChatMessage chatMessageEntity) ;
+
+
+
+//    @Mapping(target = "sender.phoneNumber", source = "senderPhoneNumber")
+//    @Mapping(target = "recipient.phoneNumber", source = "recipientPhoneNumber")
+//    public abstract ChatMessageDTO toChatMessageDTO(ChatMessage chatMessage, String senderPhoneNumber, String recipientPhoneNumber) ;
+
 }

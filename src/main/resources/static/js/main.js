@@ -4,13 +4,14 @@ const userRegistration = document.querySelector(".user-registration");
 const chatContainer = document.querySelector(".chat-container");
 const userForm = document.querySelector("#user-form-details");
 const chatArea = document.querySelector(".chat-area");
+const chatMessages = document.querySelector(".chat-messages");
 const messageForm = document.querySelector(".message-form");
 const logoutButton = document.querySelector(".logout");
 const messageInput = document.querySelector(".message-input");
 
-let firstName=null;
-let lastName=null;
-let phoneNumber=null;
+let userFirstName=null;
+let userLastName=null;
+let userPhoneNumber=null;
 let selectedUserId=null;
 let selectedUserFirstName=null;
 let selectedUserLastName = null;
@@ -26,35 +27,38 @@ function connect(event) {
 
     console.log("Connecting to WebSocket");
 
-    firstName = document.querySelector("#first-name").value.trim();
-    lastName = document.querySelector("#last-name").value.trim();
-    phoneNumber = document.querySelector("#phone-number").value.trim();
+    userFirstName = document.querySelector("#first-name").value.trim();
+    userLastName = document.querySelector("#last-name").value.trim();
+    userPhoneNumber = document.querySelector("#phone-number").value.trim();
 
-    if(firstName && lastName && phoneNumber){
+    if(userFirstName && userLastName && userPhoneNumber){
 
         userRegistration.classList.add("hidden");
         chatContainer.classList.remove("hidden");
 
         console.log("Connecting to WebSocket 2");
 
-        const socket = new SockJS('http://localhost:9090/ws');
+        const socket = new SockJS('/ws');
         stompClient = Stomp.over(socket);
 
         console.log("Connected");
-        stompClient.connect({},onConnect,onError);
+        stompClient.connect({phoneNumber: userPhoneNumber },
+            onConnect,onError);
     }
 
     event.preventDefault();
 }
 
-function onConnect() {
+ function onConnect() {
     console.log("Connected to WebSocket");
 
-    //private message subscription
-    stompClient.subscribe(`/user/${phoneNumber}/queue/messages`,onMessageReceived);
-
     //public message subscription
-    stompClient.subscribe(`/topic/public`,onMessageReceived);
+    stompClient.subscribe(`/topic/public`, onMessageReceived);
+
+    //private message subscription
+    // stompClient.subscribe(`/user/${userPhoneNumber}/queue/messages`, onMessageReceived);
+
+     stompClient.subscribe("/user/queue/messages", onMessageReceived);
 
     //publish user details to the server
     //Blob -> Binary Large Object for sending and store binary data (images, audio, video, object.)
@@ -62,13 +66,13 @@ function onConnect() {
         "/app/user.add",  //destination endpoint
         {},     //headers
         JSON.stringify({    //payload
-            firstName:firstName,
-            lastName:lastName,
-            phoneNumber:phoneNumber
+            firstName: userFirstName,
+            lastName: userLastName,
+            phoneNumber: userPhoneNumber
         })
     );
 
-    document.querySelector(".user-name").textContent = `${firstName} ${lastName}`;
+    document.querySelector(".user-name").textContent = `${userFirstName} ${userLastName}`;
 
     findAndDisplayConnectedUsers().then();
 }
@@ -78,12 +82,16 @@ async function findAndDisplayConnectedUsers(){
     const connectedUserResponse = await fetch('/users');  //Metadata about the connected users
     let connectedUsers = await connectedUserResponse.json();    //Data
 
-    connectedUsers = connectedUsers.filter(user => user.phoneNumber !== phoneNumber); //filter out the current user
+    connectedUsers = connectedUsers.filter(user => user.phoneNumber !== userPhoneNumber); //filter out the current user
 
     const connectedUsersList = document.querySelector("#online-users-list");
     connectedUsersList.innerHTML = '';
 
-    connectedUsers.forEach(user=>{
+    if(!chatContainer.classList.contains('hidden')){
+        chatArea.classList.add('hidden');
+    }
+
+    connectedUsers.forEach(user =>{
 
         appendUserElement(user,connectedUsersList);
 
@@ -97,10 +105,10 @@ function appendUserElement(user, connectedUsersList) {
 
     const userItem=document.createElement('li');
     userItem.classList.add('user-item');
-    userItem.id = user.phoneNumber;
+    userItem.id = `user-${user.phoneNumber}`;
 
     const userImage =document.createElement('img');
-    userImage.src='../images/userImage.svg';
+    userImage.src='../images/userImage.png';
     userImage.alt = `${user.firstName} ${user.lastName}`;
 
     const userNameParag = document.createElement('p');
@@ -127,12 +135,12 @@ function userItemClick(event){
         }
     );
 
-    messageForm.classList.remove('hidden');
+    chatArea.classList.remove('hidden');
 
     const clickedUser = event.currentTarget;
     clickedUser.classList.add('active');
 
-    selectedUserId = clickedUser.id;
+    selectedUserId = clickedUser.id.split('-')[1];
     selectedUserFirstName = clickedUser.querySelector('p').textContent.split(' ')[0];
     selectedUserLastName = clickedUser.querySelector('p').textContent.split(' ')[1];
 
@@ -140,20 +148,22 @@ function userItemClick(event){
 
     const nbrMsg = clickedUser.querySelector('.received-msgs');
     nbrMsg.classList.remove('hidden');
-    nbrMsg.textContent = '0'; // Reset the message count when user is clicked
+    nbrMsg.textContent = ''; // Reset the message count when user is clicked
 
 }
 
 async function fetchAndDisplayUserChat(){
 
-    let chatRoomId = `${firstName}_${selectedUserFirstName}`;
+    // let chatRoomId = `${userPhoneNumber}_${selectedUserId}`;
 
-    const chatResponse = await  fetch(`/messages/${chatRoomId}`)
-    let chatMessages = await chatResponse.json();
+    const chatResponse = await  fetch(`/messages/${userPhoneNumber}/${selectedUserId}`);
+    let chat = await chatResponse.json();
 
-    chatArea.innerHTML = '';
+    console.log("chat messages:", chat);
 
-    chatMessages.forEach(
+    chatMessages.innerHTML = '';
+
+    chat.forEach(
       message=>{
 
           displayChatMessage(message.sender.phoneNumber,message.content);
@@ -169,7 +179,7 @@ function displayChatMessage(senderId,content){
     const messageContainer = document.createElement('div');
     messageContainer.classList.add('message');
 
-    if(senderId === phoneNumber){
+    if(senderId === userPhoneNumber){
         messageContainer.classList.add('sender');
     }else{
         messageContainer.classList.add('receiver');
@@ -180,14 +190,15 @@ function displayChatMessage(senderId,content){
 
     messageContainer.appendChild(messageParag);
 
-    chatArea.appendChild(messageContainer);
-
+    chatMessages.appendChild(messageContainer);
 
 }
 
 async function onMessageReceived(payload) {
 
     await findAndDisplayConnectedUsers();  //for new user registration
+
+    console.log("Received message payload: ", payload.body);
 
     const message = JSON.parse(payload.body);  //convert JSON string to JavaScript object
 
@@ -199,12 +210,12 @@ async function onMessageReceived(payload) {
     chatArea.scrollTop = chatArea.scrollHeight;   //for auto scroll to the bottom of the chat area
 
     if(selectedUserId){
-        document.querySelector(`#${selectedUserId}`).classList.add('active');
+        ocument.querySelector(`#user-${selectedUserId}`).classList.add('active');
     }else{
-        messageForm.classList.add('hidden');
+        chatArea.classList.add('hidden');
     }
 
-    const notifidUser = document.querySelector(`#${message.sender.phoneNumber}`);
+    const notifidUser = ocument.querySelector(`#user-${message.sender.phoneNumber}`);
 
     if(notifidUser && !notifidUser.classList.contains('active')){
         const receivedMsgs = notifidUser.querySelector('.received-msgs');
@@ -220,16 +231,17 @@ function sendMessage(event) {
     if(stompClient && messaeContent){
         let chatMessage ={
             sender:{
-                firstName:firstName,
-                lastName:lastName,
-                phoneNumber:phoneNumber
+                firstName:userFirstName,
+                lastName:userLastName,
+                phoneNumber:userPhoneNumber
             },
-            receiver:{
+            recipient:{
                 firstName:selectedUserFirstName,
                 lastName:selectedUserLastName,
                 phoneNumber:selectedUserId
             },
-            content:messaeContent
+            content:messaeContent,
+            date:new Date()
         };
 
         stompClient.send(
@@ -238,7 +250,7 @@ function sendMessage(event) {
             JSON.stringify(chatMessage)    //payload
         );
 
-        displayChatMessage(phoneNumber, messaeContent);
+        displayChatMessage(userPhoneNumber, messaeContent);
 
         messageInput.value = '';
     }
@@ -253,9 +265,9 @@ function onLogout(){
         '/app/user.disconnected', {},
         JSON.stringify(
             {
-                firstName:firstName,
-                lastName:lastName,
-                phoneNumber:phoneNumber
+                firstName:userFirstName,
+                lastName:userLastName,
+                phoneNumber:userPhoneNumber
             }
         )
     );

@@ -2,9 +2,7 @@ package com.example.wschat.service.implementation;
 
 import com.example.wschat.mapper.ChatMapper;
 import com.example.wschat.model.dto.UserDTO;
-import com.example.wschat.model.entity.ChatRoom;
-import com.example.wschat.model.entity.User;
-import com.example.wschat.repository.jpa.ChatRoomJPARepository;
+import com.example.wschat.repository.jpa.UserJPARepository;
 import com.example.wschat.service.ChatRoomService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -15,16 +13,27 @@ import java.util.Optional;
 @AllArgsConstructor
 public class ChatRoomServiceImpl implements ChatRoomService {
 
-    private final ChatRoomJPARepository chatRoomJPARepository;
+//    private final ChatRoomJPARepository chatRoomJPARepository;
+    private final UserJPARepository userJPARepository;
     private final ChatMapper chatMapper;
 
     @Override
     public String createChatRoomOrGetId(UserDTO sender, UserDTO recipient) {
+        return "";
+    }
 
-        User senderUser = chatMapper.toUser(sender);
-        User recipientUser = chatMapper.toUser(recipient);
 
-        Optional<ChatRoom> chatRoom=chatRoomJPARepository.findBySenderIdAndRecipientId(
+/*
+    @Override
+    public String createChatRoomOrGetId(UserDTO sender, UserDTO recipient) {
+
+        User senderUser = userJPARepository.findByPhoneNumber(sender.getPhoneNumber())
+                .orElseThrow(() -> new RuntimeException("Sender not found"));
+
+        User recipientUser = userJPARepository.findByPhoneNumber(recipient.getPhoneNumber())
+                .orElseThrow(() -> new RuntimeException("Recipient not found"));
+
+        Optional<ChatRoom> chatRoom=chatRoomJPARepository.findBySenderAndRecipient(
                 senderUser, recipientUser
         );
 
@@ -33,13 +42,13 @@ public class ChatRoomServiceImpl implements ChatRoomService {
         }
 
         ChatRoom senderChatRoom = ChatRoom.builder()
-                .chatRoom(senderUser.getFirstName() +"_"+ recipientUser.getFirstName())
+                .chatRoom(senderUser.getPhoneNumber() +"_"+ recipientUser.getPhoneNumber())
                 .sender(senderUser)
                 .recipient(recipientUser)
                 .build();
 
         ChatRoom recipientChatRoom = ChatRoom.builder()
-                .chatRoom(senderUser.getFirstName() +"_"+ recipientUser.getFirstName())
+                .chatRoom(senderUser.getPhoneNumber() +"_"+ recipientUser.getPhoneNumber())
                 .sender(recipientUser)
                 .recipient(senderUser)
                 .build();
@@ -47,14 +56,16 @@ public class ChatRoomServiceImpl implements ChatRoomService {
         chatRoomJPARepository.save(senderChatRoom);
         chatRoomJPARepository.save(recipientChatRoom);
 
-        return senderUser.getFirstName() +"_"+ recipientUser.getFirstName();
+        return senderUser.getPhoneNumber() +"_"+ recipientUser.getPhoneNumber();
     }
 
     @Override
     public ChatRoom getChatRoomId(UserDTO sender, UserDTO recipient) {
 
         return chatRoomJPARepository.findByChatRoom(
-                sender.getFirstName() +"_"+ recipient.getFirstName()
+                sender.getPhoneNumber() +"_"+ recipient.getPhoneNumber()
         );
     }
+
+ */
 }

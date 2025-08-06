@@ -1,5 +1,5 @@
 package com.example.wschat.model.entity;
-
+/*
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -31,3 +31,4 @@ public class ChatRoom {
     private User recipient;
 
 }
+*/

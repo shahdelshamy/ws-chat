@@ -8,15 +8,11 @@
 
     <changeSet id="1" author="shahd.abdelnaby">
         <addColumn tableName="user">
-            <column name="last_seen" type="TIMESTAMP" defaultValue="now()"  />
+            <column name="last_seen_on" type="TIMESTAMP"   />
         </addColumn>
 
         <addColumn tableName="user">
-            <column name="created_on" type="TIMESTAMP"/>
-        </addColumn>
-
-        <addColumn tableName="user">
-            <column name="email" type="char(50)"/>
+            <column name="created_on" type="TIMESTAMP" defaultValue="now()"/>
         </addColumn>
 
         <addColumn tableName="user">
@@ -25,17 +21,15 @@
     </changeSet>
 
     <changeSet id="2" author="shahd.abdelnaby">
-        <addColumn tableName="chat_room">
-            <column name="chat_room" type="char(50)"/>
-        </addColumn>
-    </changeSet>
+        <addNotNullConstraint
+                tableName="user"
+                columnName="phone_number"
+                columnDataType="char(11)" />
 
-    <changeSet id="3" author="shahd.abdelnaby">
-        <dropForeignKeyConstraint baseTableName="chat_message" constraintName="fk_chat_message_chat_room"/>
-    </changeSet>
-
-    <changeSet id="4" author="shahd.abdelnaby">
-        <renameColumn tableName="chat_message" oldColumnName="chat_room_id" newColumnName="chat_room" columnDataType="char(50)"/>
+        <addUniqueConstraint
+                tableName="user"
+                columnNames="phone_number"
+                constraintName="uc_user_phone_number" />
     </changeSet>
 
 </databaseChangeLog>

@@ -8,5 +8,5 @@ import java.util.List;
 public interface ChatMessageService {
 
     ChatMessageDTO save(ChatMessageDTO chatMessage);
-    List<ChatMessageDTO> findAllByChatRoomId(String chatRoom);
+    List<ChatMessageDTO> findAllMessages(String senderPhoneNumber, String recipientPhoneNumber);
 }

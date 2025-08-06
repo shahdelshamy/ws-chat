@@ -17,6 +17,6 @@ public interface ChatController {
     @MessageMapping("/chat")
     ResponseEntity<Void> send(@Payload ChatMessageDTO chatMessageDTO);
 
-    @GetMapping("/messages/{chatRoomId}")
-    ResponseEntity<List<ChatMessageDTO>> getAllChatMessages(@PathVariable String chatRoomId);
+    @GetMapping("/messages/{senderPhoneNumber}/{recipientPhoneNumber}")
+    ResponseEntity<List<ChatMessageDTO>> getAllChatMessages(@PathVariable String senderPhoneNumber, @PathVariable String recipientPhoneNumber);
 }

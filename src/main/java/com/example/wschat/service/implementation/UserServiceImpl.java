@@ -8,6 +8,7 @@ import com.example.wschat.model.vto.UserVTO;
 import com.example.wschat.repository.jpa.UserJPARepository;
 import com.example.wschat.service.UserService;
 import lombok.AllArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -17,6 +18,7 @@ import java.util.Optional;
 
 @Service
 @AllArgsConstructor
+@Log4j2
 public class UserServiceImpl implements UserService {
 
     private final UserJPARepository userJPARepository;
@@ -24,14 +26,28 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserVTO addUser(UserDTO userDTO) {
+
          Optional<User> user = userJPARepository.findByPhoneNumber(userDTO.getPhoneNumber());
 
-         if(user.isPresent()){
-             return chatMapper.toUserVTO(user.get());
+         log.debug("User: {}",user.isPresent() ? user.get() : null);
+
+         if(!user.isEmpty() && user.get().getStatus() == UserStatuses.OFFLINE) {
+             User user1= user.get();
+             user1.setStatus(UserStatuses.ONLINE);
+
+             userJPARepository.save(user1);
+             return chatMapper.toUserVTO(user1);
          }
+
+        if(!user.isEmpty() && user.get().getStatus() == UserStatuses.ONLINE) {
+            log.debug("User is already online: {}", user.get());
+            return chatMapper.toUserVTO(user.get());
+        }
 
          User userEntity = chatMapper.toUser(userDTO);
          userEntity.setStatus(UserStatuses.ONLINE);
+
+        userEntity = userJPARepository.save(userEntity);
 
         return chatMapper.toUserVTO(userEntity);
     }
@@ -49,11 +65,25 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserVTO disConnectUser(UserDTO userDTO) {
-        User user = chatMapper.toUser(userDTO);
+        Optional<User> userOptional = userJPARepository.findByPhoneNumber(userDTO.getPhoneNumber());
+
+        if(userOptional.isEmpty()) {
+            throw new RuntimeException("User not found");
+        }
+
+        User user = userOptional.get();
+
         user.setStatus(UserStatuses.OFFLINE);
         user.setLastSeenOn(LocalDateTime.now());
         userJPARepository.save(user);
 
         return chatMapper.toUserVTO(user);
+    }
+
+    @Override
+    public User getUserByPhoneNumber(String phoneNumber) {
+        return userJPARepository.findByPhoneNumber(phoneNumber).orElseThrow(
+                () -> new RuntimeException("User not found")
+        );
     }
 }
