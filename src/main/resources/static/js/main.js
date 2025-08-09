@@ -49,7 +49,7 @@ function connect(event) {
     event.preventDefault();
 }
 
- function onConnect() {
+function onConnect() {
     console.log("Connected to WebSocket");
 
     //public message subscription
@@ -58,7 +58,7 @@ function connect(event) {
     //private message subscription
     // stompClient.subscribe(`/user/${userPhoneNumber}/queue/messages`, onMessageReceived);
 
-     stompClient.subscribe("/user/queue/messages", onMessageReceived);
+    stompClient.subscribe("/user/queue/messages", onMessageReceived);
 
     //publish user details to the server
     //Blob -> Binary Large Object for sending and store binary data (images, audio, video, object.)
@@ -77,7 +77,7 @@ function connect(event) {
     findAndDisplayConnectedUsers().then();
 }
 
-  //awaits for the server to send a message when it receives a message the function execute
+//awaits for the server to send a message when it receives a message the function execute
 async function findAndDisplayConnectedUsers(){
     const connectedUserResponse = await fetch('/users');  //Metadata about the connected users
     let connectedUsers = await connectedUserResponse.json();    //Data
@@ -91,25 +91,47 @@ async function findAndDisplayConnectedUsers(){
         chatArea.classList.add('hidden');
     }
 
-    connectedUsers.forEach(user =>{
-
-        appendUserElement(user,connectedUsersList);
-
-        const separetor = document.createElement("div");
-        separetor.classList.add("separetor");
-    });
+    for (const user of connectedUsers) {
+        const lastMessage = await getLastUserMessage(user.phoneNumber) || { content: "", date: "" };
+        appendUserElement(lastMessage, user, connectedUsersList);
+    }
 
 }
 
-function appendUserElement(user, connectedUsersList) {
+async function getLastUserMessage(recipientPhoneNumber) {
+    const lastUserMessageResponse = await fetch(`/lastMessage/${userPhoneNumber}/${recipientPhoneNumber}`);  //Metadata about the connected users
+    // let lastUserMessage = await lastUserMessageResponse.json();
+    // if (lastUserMessage) {
+    //     return lastUserMessage;
+    // }
+    // else{
+    //     return null;
+    // }
+
+    const text = await lastUserMessageResponse.text();
+    if (!text.trim()) {
+        return null;
+    }
+
+    return JSON.parse(text);
+
+}
+
+function appendUserElement(lastUserMessage,user, connectedUsersList) {
 
     const userItem=document.createElement('li');
-    userItem.classList.add('user-item');
+    userItem.classList.add('user-item' , 'separetor');
     userItem.id = `user-${user.phoneNumber}`;
 
     const userImage =document.createElement('img');
-    userImage.src='../images/userImage.png';
+    userImage.src='../images/userImage.jpg';
     userImage.alt = `${user.firstName} ${user.lastName}`;
+
+    const userInfo = document.createElement('div');
+    userInfo.classList.add('user-info');
+
+    const nameAndReceiveMsg = document.createElement('div');
+    nameAndReceiveMsg.classList.add('name-and-receive-msg');
 
     const userNameParag = document.createElement('p');
     userNameParag.textContent = `${user.firstName} ${user.lastName}` ;
@@ -118,9 +140,37 @@ function appendUserElement(user, connectedUsersList) {
     receivedMsgs.classList.add('received-msgs' , 'hidden');
     receivedMsgs.textContent = '0';
 
+    const messageAndDate = document.createElement('div');
+    messageAndDate.classList.add('message-and-date');
+
+    const lastMsgParag = document.createElement('p');
+    lastMsgParag.textContent = lastUserMessage.content || '';
+    lastMsgParag.style.color = '#ddd';
+    lastMsgParag.style.width = '60px';
+    lastMsgParag.style.margin = '1px 25px 1px 0';
+    lastMsgParag.style.whiteSpace = 'nowrap';
+    lastMsgParag.style.overflow = 'hidden';
+    lastMsgParag.style.textOverflow = 'ellipsis';
+
+    const lastMsgDate = document.createElement('p');
+    lastMsgDate.textContent = lastUserMessage.date || '';
+    lastMsgDate.style.fontSize = '0.75rem';
+    lastMsgDate.style.color = '#c5baba';
+    lastMsgDate.style.margin = '1px 0';
+
+
+    nameAndReceiveMsg.appendChild(userNameParag);
+    nameAndReceiveMsg.appendChild(receivedMsgs);
+
+    messageAndDate.appendChild(lastMsgParag);
+    messageAndDate.appendChild(lastMsgDate);
+
+    userInfo.appendChild(nameAndReceiveMsg);
+    userInfo.appendChild(messageAndDate);
+
+
     userItem.appendChild(userImage);
-    userItem.appendChild(userNameParag);
-    userItem.appendChild(receivedMsgs);
+    userItem.appendChild(userInfo);
 
     userItem.addEventListener('click', userItemClick);
 
@@ -146,8 +196,8 @@ function userItemClick(event){
 
     fetchAndDisplayUserChat().then();
 
-    const nbrMsg = clickedUser.querySelector('.received-msgs');
-    nbrMsg.classList.remove('hidden');
+    const nbrMsg = clickedUser.querySelector('.user-info .name-and-receive-msg .received-msgs');
+    nbrMsg.classList.add('hidden');
     nbrMsg.textContent = ''; // Reset the message count when user is clicked
 
 }
@@ -164,10 +214,10 @@ async function fetchAndDisplayUserChat(){
     chatMessages.innerHTML = '';
 
     chat.forEach(
-      message=>{
+        message=>{
 
-          displayChatMessage(message.sender.phoneNumber,message.content);
-      }
+            displayChatMessage(message.sender.phoneNumber,message.content);
+        }
     );
 
     chatArea.scrollTop = chatArea.scrollHeight;   //for auto scroll to the bottom of the chat area
@@ -196,39 +246,72 @@ function displayChatMessage(senderId,content){
 
 async function onMessageReceived(payload) {
 
-    await findAndDisplayConnectedUsers();  //for new user registration
+    const message = JSON.parse(payload.body);
 
-    console.log("Received message payload: ", payload.body);
+    await findAndDisplayConnectedUsers();
 
-    const message = JSON.parse(payload.body);  //convert JSON string to JavaScript object
+    // const lastMessage = {
+    //     content: message.content,
+    //     date: new Date().toISOString().slice(0, 19).replace('T', ' ') // 2025-08-06 17:57:40
+    // };
 
-    if(selectedUserId && selectedUserId === message.sender.phoneNumber){
-        displayChatMessage(message.sender.phoneNumber , message.content);
+    updateLastMessage(message.sender.phoneNumber, message);
 
+    if (selectedUserId && selectedUserId === message.sender.phoneNumber) {
+        chatArea.classList.remove('hidden');
+        displayChatMessage(message.sender.phoneNumber, message.content);
     }
 
-    chatArea.scrollTop = chatArea.scrollHeight;   //for auto scroll to the bottom of the chat area
+    chatArea.scrollTop = chatArea.scrollHeight;
 
-    if(selectedUserId){
-        ocument.querySelector(`#user-${selectedUserId}`).classList.add('active');
-    }else{
+
+    if (selectedUserId) {
+        document.querySelector(`#user-${selectedUserId}`)?.classList.add('active');
+    } else {
         chatArea.classList.add('hidden');
     }
 
-    const notifidUser = ocument.querySelector(`#user-${message.sender.phoneNumber}`);
+    const notifidUser = document.querySelector(`#user-${message.sender.phoneNumber}`);
 
-    if(notifidUser && !notifidUser.classList.contains('active')){
-        const receivedMsgs = notifidUser.querySelector('.received-msgs');
-        receivedMsgs.classList.remove('hidden');
-        receivedMsgs.textContent = '';
+    if (notifidUser) {
+        const receivedMsgs = notifidUser.querySelector('.user-info .name-and-receive-msg .received-msgs');
+
+        if (!notifidUser.classList.contains('active')) {
+            receivedMsgs.classList.remove('hidden');
+            // let count = parseInt(receivedMsgs.textContent) || 0;
+            receivedMsgs.textContent = '';
+        } else {
+            receivedMsgs.textContent = '';
+            receivedMsgs.classList.add('hidden');
+        }
     }
 }
 
-function sendMessage(event) {
+function updateLastMessage(userPhoneNumberToUpdate, lastMessage) {
+    const userElement = document.querySelector(`#user-${userPhoneNumberToUpdate}`);
+    if (!userElement) return;
 
-    const messaeContent = messageInput.value.trim();
+    // Update the last message text
+    const lastMsgParag = userElement.querySelector('.message-and-date p:first-child');
+    if (lastMsgParag) {
+        lastMsgParag.textContent = lastMessage?.content || '';
+    }
 
-    if(stompClient && messaeContent){
+    // Update the last message date
+    const lastMsgDate = userElement.querySelector('.message-and-date p:last-child');
+    if (lastMsgDate) {
+        lastMsgDate.textContent = lastMessage?.date || '';
+    }
+}
+
+
+async function sendMessage(event) {
+
+    event.preventDefault();
+
+    const messageContent = messageInput.value.trim();
+
+    if(stompClient && messageContent){
         let chatMessage ={
             sender:{
                 firstName:userFirstName,
@@ -240,8 +323,8 @@ function sendMessage(event) {
                 lastName:selectedUserLastName,
                 phoneNumber:selectedUserId
             },
-            content:messaeContent,
-            date:new Date()
+            content:messageContent,
+            date: new Date().toISOString().slice(0, 19)
         };
 
         stompClient.send(
@@ -250,14 +333,16 @@ function sendMessage(event) {
             JSON.stringify(chatMessage)    //payload
         );
 
-        displayChatMessage(userPhoneNumber, messaeContent);
+        displayChatMessage(userPhoneNumber, messageContent);
+
+        updateLastMessage(selectedUserId , chatMessage);
 
         messageInput.value = '';
     }
 
-    chatArea.scrollTop = chatArea.scrollHeight;   //for auto scroll to the bottom of the chat area
-    event.preventDefault();
+    chatArea.scrollTop = chatArea.scrollHeight;   //for auto scroll to the bottom of the chat are
 }
+
 
 function onLogout(){
 

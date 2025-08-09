@@ -30,7 +30,7 @@
                 <constraints nullable="false"/>
             </column>
             <column name="content" type="text" />
-            <column name="date" type="TIMESTAMP" defaultValue="now()"/>
+            <column name="date" type="TIMESTAMP"/>
         </createTable>
     </changeSet>
 

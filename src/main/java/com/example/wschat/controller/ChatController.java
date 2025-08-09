@@ -19,4 +19,8 @@ public interface ChatController {
 
     @GetMapping("/messages/{senderPhoneNumber}/{recipientPhoneNumber}")
     ResponseEntity<List<ChatMessageDTO>> getAllChatMessages(@PathVariable String senderPhoneNumber, @PathVariable String recipientPhoneNumber);
+
+    @GetMapping("/lastMessage/{senderPhoneNumber}/{recipientPhoneNumber}")
+    ResponseEntity<ChatMessageDTO> getLastUserMessage(@PathVariable String senderPhoneNumber, @PathVariable String recipientPhoneNumber);
+
 }

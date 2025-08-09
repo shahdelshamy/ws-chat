@@ -22,4 +22,14 @@ public interface ChatMessageJPARepository extends JpaRepository<ChatMessage,Long
     """
     )
     List<ChatMessage> findBySenderAndRecipient(User sender, User recipient);
+
+    @Query(
+            """
+                SELECT m FROM ChatMessage m
+                WHERE (m.sender = :sender AND m.recipient = :recipient)
+                   OR (m.sender = :recipient AND m.recipient = :sender)
+                ORDER BY m.date DESC LIMIT 1
+            """
+    )
+    ChatMessage findLastMessage(User sender, User recipient);
 }

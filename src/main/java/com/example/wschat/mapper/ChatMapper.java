@@ -18,12 +18,21 @@ public abstract class ChatMapper {
     @Mapping(target = "sender", source = "sender")
     @Mapping(target = "recipient", source = "recipient")
     @Mapping(target = "content", source = "chatMessageDTO.content")
-    @Mapping(target = "date", ignore = true)
+    @Mapping(target = "date", source = "chatMessageDTO.date")
     @Mapping(target = "id", ignore = true)
     public abstract ChatMessage toChatMessage(ChatMessageDTO chatMessageDTO , User sender, User recipient);
 
-    public abstract ChatMessageDTO toChatMessageDTO(ChatMessage chatMessageEntity) ;
+    /* <<<<<<<<<<<<<<  ? Windsurf Command ? >>>>>>>>>>>>>>>> */
+    /**
+     * Converts a ChatMessage entity to a ChatMessageDTO.
+     *
+     * @param chatMessageEntity the ChatMessage entity to convert
+     * @return the converted ChatMessageDTO
+     */
 
+    /* <<<<<<<<<<  4dd435ce-78be-46b1-8c9f-609ecc3d041c  >>>>>>>>>>> */
+    @Mapping(target = "date", source = "date")
+    public abstract ChatMessageDTO toChatMessageDTO(ChatMessage chatMessageEntity) ;
 
 
 //    @Mapping(target = "sender.phoneNumber", source = "senderPhoneNumber")

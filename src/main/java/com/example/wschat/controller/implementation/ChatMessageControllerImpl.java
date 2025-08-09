@@ -33,4 +33,9 @@ public class ChatMessageControllerImpl implements ChatController {
     public ResponseEntity<List<ChatMessageDTO>> getAllChatMessages(String senderPhoneNumber, String recipientPhoneNumber) {
         return ResponseEntity.ok(chatMessageService.findAllMessages(senderPhoneNumber , recipientPhoneNumber));
     }
+
+    @Override
+    public ResponseEntity<ChatMessageDTO> getLastUserMessage(String senderPhoneNumber, String recipientPhoneNumber) {
+        return ResponseEntity.ok(chatMessageService.getLastUserMessage(senderPhoneNumber, recipientPhoneNumber));
+    }
 }
