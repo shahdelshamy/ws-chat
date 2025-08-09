@@ -159,6 +159,7 @@ function appendUserElement(lastUserMessage,user, connectedUsersList) {
     lastMsgDate.style.margin = '1px 0';
 
 
+
     nameAndReceiveMsg.appendChild(userNameParag);
     nameAndReceiveMsg.appendChild(receivedMsgs);
 
