@@ -146,8 +146,8 @@ function appendUserElement(lastUserMessage,user, connectedUsersList) {
     const lastMsgParag = document.createElement('p');
     lastMsgParag.textContent = lastUserMessage.content || '';
     lastMsgParag.style.color = '#ddd';
-    lastMsgParag.style.width = '60px';
-    lastMsgParag.style.margin = '1px 25px 1px 0';
+    lastMsgParag.style.width = '90px';
+    lastMsgParag.style.margin = '1px 10px 1px 0';
     lastMsgParag.style.whiteSpace = 'nowrap';
     lastMsgParag.style.overflow = 'hidden';
     lastMsgParag.style.textOverflow = 'ellipsis';
