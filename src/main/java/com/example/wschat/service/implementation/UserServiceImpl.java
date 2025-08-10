@@ -60,6 +60,8 @@ public class UserServiceImpl implements UserService {
         List<UserVTO> userVTOList =
                 users.stream().map(user -> chatMapper.toUserVTO(user)).toList();
 
+        System.out.println(userVTOList);
+
         return userVTOList;
     }
 

@@ -32,7 +32,7 @@ public class ChatMessage {
     @Column(name = "content")
     private String content;
 
-    @Column(name = "date")
+    @Column(name = "date" )
     private LocalDateTime date;
 
 }

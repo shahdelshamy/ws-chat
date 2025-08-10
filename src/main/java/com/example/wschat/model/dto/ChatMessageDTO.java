@@ -1,5 +1,6 @@
 package com.example.wschat.model.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.Column;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -18,6 +19,8 @@ public class ChatMessageDTO {
     private UserDTO sender;
     private UserDTO recipient;
     private String content;
+
+//    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime date;
 
 }

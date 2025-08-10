@@ -18,7 +18,7 @@ public abstract class ChatMapper {
     @Mapping(target = "sender", source = "sender")
     @Mapping(target = "recipient", source = "recipient")
     @Mapping(target = "content", source = "chatMessageDTO.content")
-    @Mapping(target = "date", source = "chatMessageDTO.date")
+    @Mapping(target = "date" , source = "chatMessageDTO.date")
     @Mapping(target = "id", ignore = true)
     public abstract ChatMessage toChatMessage(ChatMessageDTO chatMessageDTO , User sender, User recipient);
 

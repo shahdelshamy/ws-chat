@@ -85,6 +85,7 @@ async function findAndDisplayConnectedUsers(){
     connectedUsers = connectedUsers.filter(user => user.phoneNumber !== userPhoneNumber); //filter out the current user
 
     const connectedUsersList = document.querySelector("#online-users-list");
+
     connectedUsersList.innerHTML = '';
 
     if(!chatContainer.classList.contains('hidden')){
@@ -157,7 +158,6 @@ function appendUserElement(lastUserMessage,user, connectedUsersList) {
     lastMsgDate.style.fontSize = '0.75rem';
     lastMsgDate.style.color = '#c5baba';
     lastMsgDate.style.margin = '1px 0';
-
 
 
     nameAndReceiveMsg.appendChild(userNameParag);
@@ -246,19 +246,37 @@ function displayChatMessage(senderId,content){
 }
 
 async function onMessageReceived(payload) {
-
     const message = JSON.parse(payload.body);
 
-    await findAndDisplayConnectedUsers();
+    // If message doesn't have a sender, treat it as a new-user event
+    if (!message.sender) {
 
-    // const lastMessage = {
-    //     content: message.content,
-    //     date: new Date().toISOString().slice(0, 19).replace('T', ' ') // 2025-08-06 17:57:40
-    // };
+        const user = message.body; // Extract actual UserDTO from body
 
-    updateLastMessage(message.sender.phoneNumber, message);
+        // Avoid adding yourself
+        if (user.phoneNumber === userPhoneNumber) return;
 
-    if (selectedUserId && selectedUserId === message.sender.phoneNumber) {
+        // Avoid duplicates
+        if (!document.querySelector(`#user-${user.phoneNumber}`)) {
+            const lastMessage = {content: "", date: ""};
+            appendUserElement(lastMessage, user, document.querySelector("#online-users-list"));
+        }
+        return;
+    }
+
+    // -------------------
+    // Normal chat message handling
+    // -------------------
+    const senderPhone = message.sender.phoneNumber;
+    const activeUserElement = document.querySelector(`#user-${senderPhone}`);
+
+    if (!activeUserElement) {
+        // New user sending message before being in the list
+        const lastMessage = { content: message.content, date: message.date };
+        appendUserElement(lastMessage, message.sender, document.querySelector("#online-users-list"));
+    } else {
+        // Update last message for existing user
+        updateLastMessage(senderPhone, message);
         chatArea.classList.remove('hidden');
         displayChatMessage(message.sender.phoneNumber, message.content);
     }
@@ -266,11 +284,6 @@ async function onMessageReceived(payload) {
     chatArea.scrollTop = chatArea.scrollHeight;
 
 
-    if (selectedUserId) {
-        document.querySelector(`#user-${selectedUserId}`)?.classList.add('active');
-    } else {
-        chatArea.classList.add('hidden');
-    }
 
     const notifidUser = document.querySelector(`#user-${message.sender.phoneNumber}`);
 
@@ -286,7 +299,9 @@ async function onMessageReceived(payload) {
             receivedMsgs.classList.add('hidden');
         }
     }
+
 }
+
 
 function updateLastMessage(userPhoneNumberToUpdate, lastMessage) {
     const userElement = document.querySelector(`#user-${userPhoneNumberToUpdate}`);
@@ -325,6 +340,7 @@ async function sendMessage(event) {
                 phoneNumber:selectedUserId
             },
             content:messageContent,
+            //date: new Date().toLocaleString("sv-SE")
             date: new Date().toISOString().slice(0, 19)
         };
 
@@ -335,6 +351,8 @@ async function sendMessage(event) {
         );
 
         displayChatMessage(userPhoneNumber, messageContent);
+
+        // let lastUserMessage = await getLastUserMessage(selectedUserId);
 
         updateLastMessage(selectedUserId , chatMessage);
 
