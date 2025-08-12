@@ -24,6 +24,6 @@ public interface UserController {
     ResponseEntity<UserVTO> disConnectUser(@Payload UserDTO userDTO);
 
     @GetMapping("/users")
-    ResponseEntity<List<UserVTO> >connectedUsers();    //from server to client, not a message mapping
+    ResponseEntity<List<UserVTO> >allUsers();    //from server to client, not a message mapping
 
 }

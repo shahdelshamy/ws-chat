@@ -20,7 +20,11 @@ public abstract class ChatMapper {
     @Mapping(target = "content", source = "chatMessageDTO.content")
     @Mapping(target = "date" , source = "chatMessageDTO.date")
     @Mapping(target = "id", ignore = true)
+    @Mapping(target = "isSeen", ignore = true)
     public abstract ChatMessage toChatMessage(ChatMessageDTO chatMessageDTO , User sender, User recipient);
+
+    public abstract ChatMessage toChatMessage(ChatMessageDTO chatMessageDTO);
+
 
     /* <<<<<<<<<<<<<<  ? Windsurf Command ? >>>>>>>>>>>>>>>> */
     /**

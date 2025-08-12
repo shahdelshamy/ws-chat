@@ -13,4 +13,8 @@ public interface ChatMessageService {
 
     ChatMessageDTO getLastUserMessage(String senderPhoneNumber, String recipientPhoneNumber);
 
+    void seeMessages(String senderPhoneNumber, String recipientPhoneNumber);
+
+    Integer countUnseenMessages(String senderPhoneNumber, String recipientPhoneNumber);
+
 }

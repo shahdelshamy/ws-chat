@@ -1,5 +1,6 @@
 package com.example.wschat.model.dto;
 
+import com.example.wschat.model.enums.UserStatuses;
 import jakarta.persistence.Column;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -21,4 +22,5 @@ public class UserDTO {
     private String phoneNumber;
     private LocalDateTime createdOn;
     private LocalDateTime lastSeenOn;
+    private UserStatuses status;
 }

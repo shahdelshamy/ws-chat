@@ -32,4 +32,19 @@ public interface ChatMessageJPARepository extends JpaRepository<ChatMessage,Long
             """
     )
     ChatMessage findLastMessage(User sender, User recipient);
+
+
+    @Query(
+            """
+                SELECT m FROM ChatMessage m
+                WHERE ((m.sender = :sender AND m.recipient = :recipient)
+                   OR (m.sender = :recipient AND m.recipient = :sender))
+                   AND m.isSeen = false
+                ORDER BY m.date DESC
+            """
+    )
+    List<ChatMessage> findNotSeenMessages(User sender, User recipient);
+
+
+
 }

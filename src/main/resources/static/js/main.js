@@ -58,7 +58,7 @@ function onConnect() {
     //private message subscription
     // stompClient.subscribe(`/user/${userPhoneNumber}/queue/messages`, onMessageReceived);
 
-    stompClient.subscribe("/user/queue/messages", onMessageReceived);
+    stompClient.subscribe("/user/queue/message", onMessageReceived);
 
     //publish user details to the server
     //Blob -> Binary Large Object for sending and store binary data (images, audio, video, object.)
@@ -100,7 +100,7 @@ async function findAndDisplayConnectedUsers(){
 }
 
 async function getLastUserMessage(recipientPhoneNumber) {
-    const lastUserMessageResponse = await fetch(`/lastMessage/${userPhoneNumber}/${recipientPhoneNumber}`);  //Metadata about the connected users
+    const lastUserMessageResponse = await fetch(`/chats/${userPhoneNumber}/${recipientPhoneNumber}/lastMessage`);  //Metadata about the connected users
     // let lastUserMessage = await lastUserMessageResponse.json();
     // if (lastUserMessage) {
     //     return lastUserMessage;
@@ -118,15 +118,32 @@ async function getLastUserMessage(recipientPhoneNumber) {
 
 }
 
-function appendUserElement(lastUserMessage,user, connectedUsersList) {
+async function appendUserElement(lastUserMessage,user, connectedUsersList) {
 
     const userItem=document.createElement('li');
     userItem.classList.add('user-item' , 'separetor');
     userItem.id = `user-${user.phoneNumber}`;
 
+    const imageDiv = document.createElement('div');
+    imageDiv.classList.add('image-div');
+
     const userImage =document.createElement('img');
     userImage.src='../images/userImage.jpg';
     userImage.alt = `${user.firstName} ${user.lastName}`;
+
+    const onlineMarker = document.createElement('span');
+    onlineMarker.classList.add('mark-as-online');
+    onlineMarker.textContent = '';
+
+    if(user.status === 'ONLINE'){
+        onlineMarker.classList.remove('hidden');
+    }else {
+        onlineMarker.classList.add('hidden');
+    }
+
+    imageDiv.appendChild(userImage);
+    imageDiv.appendChild(onlineMarker);
+
 
     const userInfo = document.createElement('div');
     userInfo.classList.add('user-info');
@@ -135,11 +152,12 @@ function appendUserElement(lastUserMessage,user, connectedUsersList) {
     nameAndReceiveMsg.classList.add('name-and-receive-msg');
 
     const userNameParag = document.createElement('p');
+    userNameParag.classList.add('user-name');
     userNameParag.textContent = `${user.firstName} ${user.lastName}` ;
 
     const receivedMsgs = document.createElement('span');
     receivedMsgs.classList.add('received-msgs' , 'hidden');
-    receivedMsgs.textContent = '0';
+    receivedMsgs.textContent = '';
 
     const messageAndDate = document.createElement('div');
     messageAndDate.classList.add('message-and-date');
@@ -159,7 +177,6 @@ function appendUserElement(lastUserMessage,user, connectedUsersList) {
     lastMsgDate.style.color = '#c5baba';
     lastMsgDate.style.margin = '1px 0';
 
-
     nameAndReceiveMsg.appendChild(userNameParag);
     nameAndReceiveMsg.appendChild(receivedMsgs);
 
@@ -170,8 +187,29 @@ function appendUserElement(lastUserMessage,user, connectedUsersList) {
     userInfo.appendChild(messageAndDate);
 
 
-    userItem.appendChild(userImage);
+    userItem.appendChild(imageDiv);
     userItem.appendChild(userInfo);
+
+    let numOfUnSeenMsg = await getUnseenMessageCount(userPhoneNumber, user);
+
+    if(lastUserMessage.content === '' && lastUserMessage.date === '' && numOfUnSeenMsg === 0){
+        userItem.addEventListener('click', userItemClick);
+
+        connectedUsersList.appendChild(userItem);
+        return;
+    }
+
+    if(lastUserMessage.sender.phoneNumber === userPhoneNumber){
+        numOfUnSeenMsg = 0;
+        receivedMsgs.classList.add('hidden');
+        receivedMsgs.textContent = '';
+    }
+
+    if(numOfUnSeenMsg > 0){
+        const receivedMsgs = userItem.querySelector('.user-info .name-and-receive-msg .received-msgs');
+        receivedMsgs.classList.remove('hidden');
+        receivedMsgs.textContent = numOfUnSeenMsg;
+    }
 
     userItem.addEventListener('click', userItemClick);
 
@@ -201,13 +239,18 @@ function userItemClick(event){
     nbrMsg.classList.add('hidden');
     nbrMsg.textContent = ''; // Reset the message count when user is clicked
 
+    stompClient.send(
+        `/app/chats/${userPhoneNumber}/${selectedUserId}/messages/seen`,  //destination endpoint
+        {},     //headers
+        null
+    )
 }
 
 async function fetchAndDisplayUserChat(){
 
     // let chatRoomId = `${userPhoneNumber}_${selectedUserId}`;
 
-    const chatResponse = await  fetch(`/messages/${userPhoneNumber}/${selectedUserId}`);
+    const chatResponse = await  fetch(`/chats/${userPhoneNumber}/${selectedUserId}`);
     let chat = await chatResponse.json();
 
     console.log("chat messages:", chat);
@@ -261,6 +304,14 @@ async function onMessageReceived(payload) {
             const lastMessage = {content: "", date: ""};
             appendUserElement(lastMessage, user, document.querySelector("#online-users-list"));
         }
+        if(user.status === 'OFFLINE'){
+            document.querySelector(`#user-${user.phoneNumber} .image-div .mark-as-online`)
+                .classList.add('hidden');
+        }
+        if(user.status === 'ONLINE'){
+            document.querySelector(`#user-${user.phoneNumber} .image-div .mark-as-online`)
+                .classList.remove('hidden');
+        }
         return;
     }
 
@@ -277,13 +328,21 @@ async function onMessageReceived(payload) {
     } else {
         // Update last message for existing user
         updateLastMessage(senderPhone, message);
-        chatArea.classList.remove('hidden');
         displayChatMessage(message.sender.phoneNumber, message.content);
+    }
+
+    if(selectedUserId === message.sender.phoneNumber){
+        chatArea.classList.remove('hidden');
+    }else{
+        chatArea.classList.add('hidden');
     }
 
     chatArea.scrollTop = chatArea.scrollHeight;
 
+    // const numOfUnSeenMsgResponse = await fetch(`/chats/${userPhoneNumber}/${selectedUserId}/messages/unseen/count`);  //Metadata about the connected users
+    // let numOfUnSeenMsg = await numOfUnSeenMsgResponse.json();
 
+    let numOfUnSeenMsg = await getUnseenMessageCount(userPhoneNumber, message.sender);
 
     const notifidUser = document.querySelector(`#user-${message.sender.phoneNumber}`);
 
@@ -292,14 +351,19 @@ async function onMessageReceived(payload) {
 
         if (!notifidUser.classList.contains('active')) {
             receivedMsgs.classList.remove('hidden');
-            // let count = parseInt(receivedMsgs.textContent) || 0;
-            receivedMsgs.textContent = '';
+            receivedMsgs.textContent = numOfUnSeenMsg;
         } else {
             receivedMsgs.textContent = '';
             receivedMsgs.classList.add('hidden');
         }
     }
 
+}
+
+async function getUnseenMessageCount(userPhoneNumber, user) {
+    const response = await fetch(`/chats/${userPhoneNumber}/${user.phoneNumber}/messages/unseen/count`);
+    const numOfUnSeenMsg = await response.json();
+    return numOfUnSeenMsg;
 }
 
 
@@ -345,7 +409,7 @@ async function sendMessage(event) {
         };
 
         stompClient.send(
-            '/app/chat',  //destination endpoint
+            '/app/chats/message',  //destination endpoint
             {},     //headers
             JSON.stringify(chatMessage)    //payload
         );

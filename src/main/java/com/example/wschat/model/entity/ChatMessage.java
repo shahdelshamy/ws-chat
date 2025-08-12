@@ -35,4 +35,7 @@ public class ChatMessage {
     @Column(name = "date" )
     private LocalDateTime date;
 
+    @Column(name = "is_seen" )
+    private Boolean isSeen;
+
 }

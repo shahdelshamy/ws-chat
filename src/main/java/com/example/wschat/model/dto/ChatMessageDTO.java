@@ -22,5 +22,6 @@ public class ChatMessageDTO {
 
 //    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime date;
+    private boolean isSeen;
 
 }

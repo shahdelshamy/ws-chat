@@ -53,9 +53,9 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<UserVTO> getConnectedUsers() {
+    public List<UserVTO> getAllUsers() {
 
-        List<User> users = userJPARepository.findByStatus(UserStatuses.ONLINE);
+        List<User> users = userJPARepository.findAll();
 
         List<UserVTO> userVTOList =
                 users.stream().map(user -> chatMapper.toUserVTO(user)).toList();

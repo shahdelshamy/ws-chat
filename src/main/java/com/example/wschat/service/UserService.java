@@ -9,7 +9,7 @@ import java.util.List;
 public interface UserService {
 
     UserVTO addUser(UserDTO userDTO);
-    List<UserVTO> getConnectedUsers();
+    List<UserVTO> getAllUsers();
     UserVTO disConnectUser(UserDTO userDTO);
     User getUserByPhoneNumber(String phoneNumber);
 }

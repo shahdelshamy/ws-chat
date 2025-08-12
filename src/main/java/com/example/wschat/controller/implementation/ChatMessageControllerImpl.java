@@ -24,7 +24,7 @@ public class ChatMessageControllerImpl implements ChatController {
         ChatMessageDTO chatMessage = chatMessageService.save(chatMessageDTO);
         simpMessagingTemplate.convertAndSendToUser(
                 chatMessageDTO.getRecipient().getPhoneNumber(),  // username
-                "/queue/messages",                               // destination
+                "/queue/message",                               // destination
                 chatMessageDTO);
         return ResponseEntity.status(NO_CONTENT).build();
     }
@@ -37,5 +37,16 @@ public class ChatMessageControllerImpl implements ChatController {
     @Override
     public ResponseEntity<ChatMessageDTO> getLastUserMessage(String senderPhoneNumber, String recipientPhoneNumber) {
         return ResponseEntity.ok(chatMessageService.getLastUserMessage(senderPhoneNumber, recipientPhoneNumber));
+    }
+
+    @Override
+    public ResponseEntity<Void> seeMessages(String senderPhoneNumber, String recipientPhoneNumber) {
+        chatMessageService.seeMessages(senderPhoneNumber, recipientPhoneNumber);
+        return ResponseEntity.status(NO_CONTENT).build();
+    }
+
+    @Override
+    public ResponseEntity<Integer> countUnseenMessages(String senderPhoneNumber, String recipientPhoneNumber) {
+        return ResponseEntity.ok(chatMessageService.countUnseenMessages(senderPhoneNumber, recipientPhoneNumber));
     }
 }

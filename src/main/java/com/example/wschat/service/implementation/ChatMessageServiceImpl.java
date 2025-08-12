@@ -26,13 +26,17 @@ public class ChatMessageServiceImpl implements ChatMessageService {
     private final UserService userService;
 
     @Override
-    public ChatMessageDTO save(ChatMessageDTO chatMessage) {
+    public ChatMessageDTO save(ChatMessageDTO chatMessageDTO) {
 
-        User sender = userService.getUserByPhoneNumber(chatMessage.getSender().getPhoneNumber());
+        User sender = userService.getUserByPhoneNumber(chatMessageDTO.getSender().getPhoneNumber());
 
-        User recipient = userService.getUserByPhoneNumber(chatMessage.getRecipient().getPhoneNumber());
+        User recipient = userService.getUserByPhoneNumber(chatMessageDTO.getRecipient().getPhoneNumber());
 
-        ChatMessage chatMessageEntity = chatMessageJPARepository.save(chatMapper.toChatMessage(chatMessage, sender, recipient));
+        ChatMessage chatMessage = chatMapper.toChatMessage(chatMessageDTO, sender, recipient);
+
+        chatMessage.setIsSeen(false);
+
+        ChatMessage chatMessageEntity = chatMessageJPARepository.save(chatMessage);
 
         return chatMapper.toChatMessageDTO(chatMessageEntity);
     }
@@ -68,5 +72,41 @@ public class ChatMessageServiceImpl implements ChatMessageService {
         }
 
         return null;
+    }
+
+    @Override
+    public void seeMessages(String senderPhoneNumber, String recipientPhoneNumber) {
+
+        User sender = userService.getUserByPhoneNumber(senderPhoneNumber);
+
+        User recipient = userService.getUserByPhoneNumber(recipientPhoneNumber);
+
+        List<ChatMessage> chatMessages = chatMessageJPARepository.findNotSeenMessages(sender, recipient);
+
+        chatMessages.forEach(
+                (message)->{
+                    message.setIsSeen(true);
+                    chatMessageJPARepository.save(message);
+                }
+
+        );
+
+    }
+
+
+    @Override
+    public Integer countUnseenMessages(String senderPhoneNumber, String recipientPhoneNumber) {
+
+        User sender = userService.getUserByPhoneNumber(senderPhoneNumber);
+
+        User recipient = userService.getUserByPhoneNumber(recipientPhoneNumber);
+
+        List<ChatMessage> UnseenMessages = chatMessageJPARepository.findNotSeenMessages(sender, recipient);
+
+        if (! UnseenMessages.isEmpty()) {
+            return UnseenMessages.size();
+        }
+
+        return 0;
     }
 }

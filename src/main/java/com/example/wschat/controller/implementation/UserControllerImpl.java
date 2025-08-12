@@ -27,7 +27,7 @@ public class UserControllerImpl implements UserController {
     }
 
     @Override
-    public ResponseEntity<List<UserVTO>> connectedUsers() {
-        return ResponseEntity.ok(userService.getConnectedUsers());
+    public ResponseEntity<List<UserVTO>> allUsers() {
+        return ResponseEntity.ok(userService.getAllUsers());
     }
 }
