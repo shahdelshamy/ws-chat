@@ -293,11 +293,6 @@ body{
     border-radius: 8px;
     padding-bottom: 20px;
 }
-.message-form div{
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-}
 
 .message-form input{
     padding: 8px;
@@ -315,23 +310,9 @@ body{
     border-style: solid;
 }
 
-.sms-icon{
-    border:  2px solid #e5d8dd;
-    border-radius: 5px;
-    padding: 7px;
-    color: #3498db;
-    font-size: 22px;
-    cursor: pointer;
-}
-
-.sms-icon:hover{
-    background-color: #3498db;
-    color: #fff;
-}
-
 .message-form button{
     padding: 8px;
-    margin: 4px;
+    margin-left: 15px;
     border: none;
     border-radius: 5px;
     background-color: #3498db;

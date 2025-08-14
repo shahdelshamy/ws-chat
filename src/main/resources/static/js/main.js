@@ -8,7 +8,6 @@ const chatMessages = document.querySelector(".chat-messages");
 const messageForm = document.querySelector(".message-form");
 const logoutButton = document.querySelector(".logout");
 const messageInput = document.querySelector(".message-input");
-const smsButton = document.querySelector(".sms-icon");
 
 let userFirstName=null;
 let userLastName=null;
@@ -333,11 +332,6 @@ async function onMessageReceived(payload) {
     }
 
     if(selectedUserId === message.sender.phoneNumber){
-        stompClient.send(
-            `/app/chats/${userPhoneNumber}/${selectedUserId}/messages/seen`,  //destination endpoint
-            {},     //headers
-            null
-        )
         chatArea.classList.remove('hidden');
     }else{
         chatArea.classList.add('hidden');
@@ -368,7 +362,8 @@ async function onMessageReceived(payload) {
 
 async function getUnseenMessageCount(userPhoneNumber, user) {
     const response = await fetch(`/chats/${userPhoneNumber}/${user.phoneNumber}/messages/unseen/count`);
-    return await response.json();
+    const numOfUnSeenMsg = await response.json();
+    return numOfUnSeenMsg;
 }
 
 
@@ -425,40 +420,11 @@ async function sendMessage(event) {
 
         updateLastMessage(selectedUserId , chatMessage);
 
-        // let numOfUnSeenMsg = await getUnseenMessageCount(userPhoneNumber, selectedUserId);
-        //
-        // if (numOfUnSeenMsg > 2) {
-        //     stompClient.send(
-        //         `/app/notifications/SMS/${selectedUserId}`,  //destination endpoint
-        //         {},     //headers
-        //         userPhoneNumber
-        //     )
-        // }
-
-
         messageInput.value = '';
     }
 
     chatArea.scrollTop = chatArea.scrollHeight;   //for auto scroll to the bottom of the chat are
 }
-
-smsButton.addEventListener('click', sendSMS);
-
-function sendSMS(){
-
-    if(!selectedUserId){
-        return;
-    }
-
-    if(stompClient){
-        stompClient.send(
-            `/app/notifications/SMS/${selectedUserId}`,  //destination endpoint
-            {},     //headers
-            userPhoneNumber
-        );
-    }
-}
-
 
 
 function onLogout(){
