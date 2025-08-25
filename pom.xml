@@ -33,6 +33,9 @@
         <liquibase.version>4.27.0</liquibase.version>
         <liquibase.property-file-path>src/main/resources/liquibase/config/liquibase.properties</liquibase.property-file-path>
 
+        <firebase-admin.version>9.5.0</firebase-admin.version>
+
+        <log4j2.version>2.20.0</log4j2.version>
     </properties>
     <dependencies>
         <dependency>
@@ -54,30 +57,48 @@
             <scope>runtime</scope>
             <optional>true</optional>
         </dependency>
+
         <dependency>
             <groupId>com.mysql</groupId>
             <artifactId>mysql-connector-j</artifactId>
             <scope>runtime</scope>
         </dependency>
+
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <optional>true</optional>
         </dependency>
+
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
+
         <dependency>
             <groupId>org.mapstruct</groupId>
             <artifactId>mapstruct</artifactId>
             <version>${mapstruct.version}</version>
         </dependency>
+
         <dependency>
             <groupId>org.liquibase</groupId>
             <artifactId>liquibase-core</artifactId>
         </dependency>
+
+        <dependency>
+            <groupId>com.google.firebase</groupId>
+            <artifactId>firebase-admin</artifactId>
+            <version>${firebase-admin.version}</version>
+        </dependency>
+
+<!--        <dependency>-->
+<!--            <groupId>org.springframework.boot</groupId>-->
+<!--            <artifactId>log4j2-spring-boot-starter</artifactId>-->
+<!--            <version>${log4j2.version}</version>-->
+<!--        </dependency>-->
+
     </dependencies>
 
     <build>

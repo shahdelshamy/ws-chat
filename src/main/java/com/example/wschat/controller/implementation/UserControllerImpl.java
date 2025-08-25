@@ -4,6 +4,7 @@ import com.example.wschat.controller.UserController;
 import com.example.wschat.model.dto.UserDTO;
 import com.example.wschat.model.vto.UserVTO;
 import com.example.wschat.service.UserService;
+import com.example.wschat.service.firebase.messaging.FirebaseMessagingService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
@@ -18,7 +19,8 @@ public class UserControllerImpl implements UserController {
 
     @Override
     public ResponseEntity<UserVTO> addUser(UserDTO userDTO) {
-        return ResponseEntity.ok(userService.addUser(userDTO));
+        UserVTO userVTO = userService.addUser(userDTO);
+        return ResponseEntity.ok(userVTO);
     }
 
     @Override

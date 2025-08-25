@@ -1,12 +1,14 @@
 package com.example.wschat.service.implementation;
 
 import com.example.wschat.mapper.ChatMapper;
+import com.example.wschat.model.config.AbstractFirebaseUserConfig;
 import com.example.wschat.model.dto.UserDTO;
 import com.example.wschat.model.entity.User;
 import com.example.wschat.model.enums.UserStatuses;
 import com.example.wschat.model.vto.UserVTO;
 import com.example.wschat.repository.jpa.UserJPARepository;
 import com.example.wschat.service.UserService;
+import com.example.wschat.service.firebase.messaging.FirebaseMessagingService;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
@@ -23,6 +25,8 @@ public class UserServiceImpl implements UserService {
 
     private final UserJPARepository userJPARepository;
     private final ChatMapper chatMapper;
+    private final FirebaseMessagingService firebaseMessagingService;
+    private final AbstractFirebaseUserConfig firebaseUserConfig;
 
     @Override
     public UserVTO addUser(UserDTO userDTO) {
@@ -48,6 +52,12 @@ public class UserServiceImpl implements UserService {
          userEntity.setStatus(UserStatuses.ONLINE);
 
         userEntity = userJPARepository.save(userEntity);
+
+        firebaseMessagingService.sendNotification(
+            firebaseUserConfig.getUserToken(),
+            "New user connected",
+            "New user connected: " + userEntity.getPhoneNumber()
+        );
 
         return chatMapper.toUserVTO(userEntity);
     }
