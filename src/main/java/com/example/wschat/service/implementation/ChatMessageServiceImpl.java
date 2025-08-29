@@ -1,6 +1,7 @@
 package com.example.wschat.service.implementation;
 
 import com.example.wschat.mapper.ChatMapper;
+import com.example.wschat.model.config.AbstractFirebaseUserConfig;
 import com.example.wschat.model.dto.ChatMessageDTO;
 import com.example.wschat.model.dto.UserDTO;
 import com.example.wschat.model.entity.ChatMessage;
@@ -11,6 +12,7 @@ import com.example.wschat.repository.jpa.UserJPARepository;
 import com.example.wschat.service.ChatMessageService;
 import com.example.wschat.service.ChatRoomService;
 import com.example.wschat.service.UserService;
+import com.example.wschat.service.firebase.messaging.FirebaseMessagingService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -21,9 +23,10 @@ import java.util.List;
 public class ChatMessageServiceImpl implements ChatMessageService {
 
     private final ChatMessageJPARepository chatMessageJPARepository;
-    private final ChatRoomService chatRoomService;
     private final ChatMapper chatMapper;
     private final UserService userService;
+    private final AbstractFirebaseUserConfig firebaseUserConfig;
+    private final FirebaseMessagingService firebaseMessagingService;
 
     @Override
     public ChatMessageDTO save(ChatMessageDTO chatMessageDTO) {
@@ -37,6 +40,12 @@ public class ChatMessageServiceImpl implements ChatMessageService {
         chatMessage.setIsSeen(false);
 
         ChatMessage chatMessageEntity = chatMessageJPARepository.save(chatMessage);
+
+        firebaseMessagingService.sendNotification(
+                firebaseUserConfig.getUserToken(),
+                "New Message from " + chatMessageEntity.getSender().getFirstName(),
+                 chatMessageEntity.getContent()
+        );
 
         return chatMapper.toChatMessageDTO(chatMessageEntity);
     }
